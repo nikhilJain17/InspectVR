@@ -20,6 +20,8 @@ extension Double {
 
 class ViewController: UIViewController, WCSessionDelegate, UINavigationControllerDelegate, AVCaptureVideoDataOutputSampleBufferDelegate, CLLocationManagerDelegate {
     
+    var taskArray: [String] = ["Task 0", "Task 1", "Task 2", "Task 3", "task 4", "Task 5", "Task 6"]
+    
     let screenSize: CGRect = UIScreen.mainScreen().bounds
 
     var captureSession: AVCaptureSession?
@@ -32,7 +34,15 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
     
     let replicatorLayer = CAReplicatorLayer()
 
+    // normal mode views
+    let mainPriority: CATextLayer =  CATextLayer(); // at the top of the screen in normal mode
+    let additionalTasks: CATextLayer = CATextLayer(); // all the other crap
     
+    // overview mode views - one in middle, big; 2 on left/right, waiting to be scrolled to
+    let overviewCenter: CATextLayer = CATextLayer();
+    let overviewIndex: CATextLayer = CATextLayer()
+    
+    var mainMode: Bool = true;
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -81,7 +91,40 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
                 previewLayer?.connection.videoOrientation = AVCaptureVideoOrientation.LandscapeLeft
                 
                 
-                // setup the layer
+                // setup the views
+                
+                // @TODO get data from server to populate this
+                // @TODO swipe up with pebble to change views
+                
+                mainPriority.fontSize = 20
+                mainPriority.frame = CGRectMake(5, 5, 311, 311)
+                mainPriority.alignmentMode = kCAAlignmentCenter
+                mainPriority.string = "Main task goes here!"
+                mainPriority.foregroundColor = UIColor.whiteColor().CGColor
+                
+                additionalTasks.fontSize = 20
+                additionalTasks.frame = CGRectMake(5, 300, 311, 311)
+                additionalTasks.alignmentMode = kCAAlignmentCenter
+                additionalTasks.string = "\(taskArray.count) tasks today"
+                
+                overviewCenter.fontSize = 20
+                overviewCenter.frame = CGRectMake(5, 30, 250, 250)
+                overviewCenter.alignmentMode = kCAAlignmentCenter
+                overviewCenter.string = "Thorough information"
+                
+                
+                overviewIndex.fontSize = 15
+                overviewIndex.frame = CGRectMake(5, 10, 311, 311)
+                overviewIndex.alignmentMode = kCAAlignmentCenter
+                overviewIndex.string = "1"
+                
+                
+                ////////////////////////////////////////////////////////
+                
+
+                // start off in main mode
+                previewLayer?.addSublayer(mainPriority)
+                previewLayer!.addSublayer(additionalTasks)
                 
                 
                 replicatorLayer.addSublayer(previewLayer!)
@@ -92,37 +135,51 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
         }
     }
     
+    
+    // switches modes based on swipe with pebble
+    func switchModes(overviewMode: Bool) {
+        
+//        scrollInOverviewMode(3)
+        
+        if (overviewMode) {
+            // get rid of the current mode's views and put in the other ones
+            mainPriority.removeFromSuperlayer()
+            additionalTasks.removeFromSuperlayer()
+        
+            previewLayer?.addSublayer(overviewCenter)
+            previewLayer?.addSublayer(overviewIndex)
+        }
+        else {
+            overviewCenter.removeFromSuperlayer()
+            overviewIndex.removeFromSuperlayer()
+            
+            previewLayer?.addSublayer(mainPriority)
+            previewLayer?.addSublayer(additionalTasks)
+        }
+        
+        mainMode = !mainMode
+            
+    }
+    
+    func scrollInOverviewMode(index: Int) {
+        
+        overviewCenter.string = taskArray[index]
+        overviewIndex.string = "\(index)"
+        
+    }
 
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if let touch = touches.first {
             print("you touched me")
-            capturePicture()
+            switchModes(mainMode);
+//            capturePicture()
         }
         super.touchesBegan(touches, withEvent:event)
     }
 
-    // begin
     
     
-    
-    // try take pic
-    func screenShotMethod() {
-        
-        print("you screenshotted me")
-        
-        UIGraphicsBeginImageContextWithOptions(UIScreen.mainScreen().bounds.size, false, 0);
-        self.view.drawViewHierarchyInRect(view.bounds, afterScreenUpdates: true)
-        let image:UIImage = UIGraphicsGetImageFromCurrentImageContext();
-        
-        UIGraphicsEndImageContext();
-        
-//        self.imgView.image = image;
-        // save to camera roll
-        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-
-    }
-   
     
     // take the picture
     func capturePicture(){
@@ -158,49 +215,9 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
                 
             })
         }
-    }
+    } // end of capturePicture
     
-    func takePhoto(){
-        
-        
-        if let stillOutput = self.stillImageOutput {
-            // we do this on another thread so that we don't hang the UI
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-                //find the video connection
-                var videoConnection : AVCaptureConnection?
-                for connecton in stillOutput.connections {
-                    //find a matching input port
-                    for port in connecton.inputPorts!{
-                        if port.mediaType == AVMediaTypeVideo {
-                            videoConnection = connecton as? AVCaptureConnection
-                            break //for port
-                        }
-                    }
-                    
-                    if videoConnection  != nil {
-                        break// for connections
-                    }
-                }
-                if videoConnection  != nil {
-                    stillOutput.captureStillImageAsynchronouslyFromConnection(videoConnection){
-                        (imageSampleBuffer : CMSampleBuffer!, _) in
-                        
-                        let imageDataJpeg = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageSampleBuffer)
-                        var pickedImage: UIImage = UIImage(data: imageDataJpeg)!
-                        
-                        
-                        UIImageWriteToSavedPhotosAlbum(pickedImage, nil, nil, nil)
-
-                    }
-                    self.captureSession!.stopRunning()
-                    
-                    
-                    
-                }
-            }
-        }
-        
-    }
+    
 
     
 }
