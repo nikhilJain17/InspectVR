@@ -45,18 +45,18 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
     var mainMode: Bool = true;
     
     // soquet
-    let socket = SocketIOClient(socketURL: NSURL(string: "http://05751d3d.ngrok.io")!)
+    let socket = SocketIOClient(socketURL: NSURL(string: "http://eac5581f.ngrok.io")!)
     
+    // http://eac5581f.ngrok.io
+    // http://05751d3d.ngrok.io
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print("view did lod")
-        
         socket.connect()
         
         socket.on("connect") { data, ack in
-         
+            
             
             self.socket.emit("want tasks")
             
@@ -69,6 +69,10 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
             
             print(self.taskArray)
             
+            self.mainPriority.string = "\(self.taskArray[0])"
+            self.additionalTasks.string = "\(self.taskArray.count) tasks today"
+
+            
         }
         
     }
@@ -78,8 +82,12 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        captureSession = AVCaptureSession()
-        captureSession?.sessionPreset = AVCaptureSessionPreset1920x1080
+        
+        print("view did lod")
+        
+        
+        self.captureSession = AVCaptureSession()
+        self.captureSession?.sessionPreset = AVCaptureSessionPreset1920x1080
         
         let backCamera = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)
         
@@ -88,32 +96,32 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
         //var input = AVCaptureDeviceInput(device: backCamera, error: &error)
         var output: AVCaptureStillImageOutput?
         
-        if captureSession?.canAddInput(input) != nil {
-            captureSession?.addInput(input)
+        if self.captureSession?.canAddInput(input) != nil {
+            self.captureSession?.addInput(input)
             
-            stillImageOutput = AVCaptureStillImageOutput()
-            stillImageOutput?.outputSettings = [AVVideoCodecKey: AVVideoCodecJPEG]
+            self.stillImageOutput = AVCaptureStillImageOutput()
+            self.stillImageOutput?.outputSettings = [AVVideoCodecKey: AVVideoCodecJPEG]
             
             output = AVCaptureStillImageOutput()
             
-            if (captureSession?.canAddOutput(output) != nil) {
+            if (self.captureSession?.canAddOutput(output) != nil) {
             
-                captureSession?.addOutput(stillImageOutput)
+                self.captureSession?.addOutput(self.stillImageOutput)
 //                captureSession?.addOutput(output)
             
-                previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-                previewLayer?.videoGravity = AVLayerVideoGravityResizeAspectFill
-                previewLayer?.frame = CGRect(x: 0, y: 0, width: 300, height:  self.view.bounds.size.height - 70)
+                self.previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
+                self.previewLayer?.videoGravity = AVLayerVideoGravityResizeAspectFill
+                self.previewLayer?.frame = CGRect(x: 0, y: 0, width: 300, height:  self.view.bounds.size.height - 70)
                 //previewLayer?.frame = CGRect(self.view.bounds)
                 
-                replicatorLayer.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)
+                self.replicatorLayer.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)
                 //                replicatorLayer.frame = CGRectMake(13, 30, 360, self.view.bounds.size.height - 70)
-                replicatorLayer.instanceCount = 2
+                self.replicatorLayer.instanceCount = 2
                 
-                replicatorLayer.instanceTransform = CATransform3DMakeTranslation(self.view.bounds.size.width / 2 + 120, 0.0, 0.0)
+                self.replicatorLayer.instanceTransform = CATransform3DMakeTranslation(self.view.bounds.size.width / 2 + 120, 0.0, 0.0)
                 
                 
-                previewLayer?.connection.videoOrientation = AVCaptureVideoOrientation.LandscapeLeft
+                self.previewLayer?.connection.videoOrientation = AVCaptureVideoOrientation.LandscapeLeft
                 
                 
                 // setup the views
@@ -121,41 +129,42 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
                 // @TODO get data from server to populate this
                 // @TODO swipe up with pebble to change views
                 
-                mainPriority.fontSize = 20
-                mainPriority.frame = CGRectMake(5, 5, 311, 311)
-                mainPriority.alignmentMode = kCAAlignmentCenter
-                mainPriority.string = "Main task goes here!"
-                mainPriority.foregroundColor = UIColor.whiteColor().CGColor
+                self.mainPriority.fontSize = 20
+                self.mainPriority.frame = CGRectMake(5, 5, 311, 311)
+                self.mainPriority.alignmentMode = kCAAlignmentCenter
+//                self.mainPriority.string = "\(self.taskArray[0])"
+                self.mainPriority.foregroundColor = UIColor.whiteColor().CGColor
                 
-                additionalTasks.fontSize = 20
-                additionalTasks.frame = CGRectMake(5, 300, 311, 311)
-                additionalTasks.alignmentMode = kCAAlignmentCenter
-                additionalTasks.string = "\(taskArray.count) tasks today"
+                self.additionalTasks.fontSize = 20
+                self.additionalTasks.frame = CGRectMake(5, 300, 311, 311)
+                self.additionalTasks.alignmentMode = kCAAlignmentCenter
+//                self.additionalTasks.string = "\(self.taskArray.count) tasks today"
                 
-                overviewCenter.fontSize = 20
-                overviewCenter.frame = CGRectMake(5, 30, 250, 250)
-                overviewCenter.alignmentMode = kCAAlignmentCenter
-                overviewCenter.string = "Thorough information"
+                self.overviewCenter.fontSize = 20
+                self.overviewCenter.frame = CGRectMake(5, 30, 250, 250)
+                self.overviewCenter.alignmentMode = kCAAlignmentCenter
+                self.overviewCenter.string = "Thorough information"
                 
                 
-                overviewIndex.fontSize = 15
-                overviewIndex.frame = CGRectMake(5, 10, 311, 311)
-                overviewIndex.alignmentMode = kCAAlignmentCenter
-                overviewIndex.string = "1"
+                self.overviewIndex.fontSize = 15
+                self.overviewIndex.frame = CGRectMake(5, 10, 311, 311)
+                self.overviewIndex.alignmentMode = kCAAlignmentCenter
+                self.overviewIndex.string = "1"
                 
                 
                 ////////////////////////////////////////////////////////
                 
 
                 // start off in main mode
-                previewLayer?.addSublayer(mainPriority)
-                previewLayer!.addSublayer(additionalTasks)
+                self.previewLayer?.addSublayer(self.mainPriority)
+                self.previewLayer!.addSublayer(self.additionalTasks)
                 
                 
-                replicatorLayer.addSublayer(previewLayer!)
+                self.replicatorLayer.addSublayer(self.previewLayer!)
                 
-                self.view.layer.addSublayer(replicatorLayer)
-                captureSession?.startRunning()
+                self.view.layer.addSublayer(self.replicatorLayer)
+                self.captureSession?.startRunning()
+            
             }
         }
     }
