@@ -44,6 +44,9 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
     
     var mainMode: Bool = true;
     
+    // soquet
+    let socket = SocketIOClient(socketURL: NSURL(string: "http://05751d3d.ngrok.io")!)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
