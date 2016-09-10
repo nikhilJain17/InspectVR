@@ -20,7 +20,7 @@ extension Double {
 
 class ViewController: UIViewController, WCSessionDelegate, UINavigationControllerDelegate, AVCaptureVideoDataOutputSampleBufferDelegate, CLLocationManagerDelegate {
     
-    var taskArray: [String] = ["Task 0", "Task 1", "Task 2", "Task 3", "task 4", "Task 5", "Task 6"]
+    var taskArray: [String] = []
     
     let screenSize: CGRect = UIScreen.mainScreen().bounds
 
@@ -47,10 +47,32 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
     // soquet
     let socket = SocketIOClient(socketURL: NSURL(string: "http://05751d3d.ngrok.io")!)
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print("view did lod")
+        
+        socket.connect()
+        
+        socket.on("connect") { data, ack in
+         
+            
+            self.socket.emit("want tasks")
+            
+            
+        }
+        
+        socket.on("got tasks") { data, ack in
+            
+            self.taskArray = data[0] as! [String]
+            
+            print(self.taskArray)
+            
+        }
+        
     }
+    
     
     // when the view loads
     override func viewWillAppear(animated: Bool) {
