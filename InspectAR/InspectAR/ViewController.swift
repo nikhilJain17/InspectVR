@@ -73,8 +73,8 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
             
             print(self.taskArray)
             print(self.timeArray)
-            
-            self.mainPriority.string = "\(self.taskArray[0])"
+//            
+//            self.mainPriority.string = "\(self.taskArray[0])"
             self.additionalTasks.string = "\(self.taskArray.count) tasks today"
 
             
@@ -129,10 +129,26 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
         
         socket.on("leaderboard") { data, ack in
             
+            print("i am not a leaderboard")
             print(data[0])
             print(data[1])
             
+            var dickarray: [String] = []
+            dickarray = data[0] as! [String]
             
+            var longidck: [String] = []
+            longidck = (data[1] as? [String])!
+            
+            
+            var patriotsarecheaters: String = ""
+            
+            for (var i = 0; i < data[0].count; i++) {
+                
+                patriotsarecheaters += "\(dickarray[i]) \(longidck[i]) \n"
+                
+            }
+            
+            self.mainPriority.string = patriotsarecheaters
             
         }
         
