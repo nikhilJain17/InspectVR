@@ -21,6 +21,7 @@ extension Double {
 class ViewController: UIViewController, WCSessionDelegate, UINavigationControllerDelegate, AVCaptureVideoDataOutputSampleBufferDelegate, CLLocationManagerDelegate {
     
     var taskArray: [String] = []
+    var timeArray: [String] = []
     
     let screenSize: CGRect = UIScreen.mainScreen().bounds
 
@@ -43,6 +44,7 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
     let overviewIndex: CATextLayer = CATextLayer()
     
     var mainMode: Bool = true;
+    var currentIndex = 0;
     
     // soquet
     let socket = SocketIOClient(socketURL: NSURL(string: "http://05751d3d.ngrok.io")!)
@@ -57,23 +59,87 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
         
         socket.on("connect") { data, ack in
             
-            
             self.socket.emit("want tasks")
-            
+            self.socket.emit("want leaderboard")
             
         }
         
         socket.on("got tasks") { data, ack in
             
+            print("got tasks")
+            
             self.taskArray = data[0] as! [String]
+            self.timeArray = data[1] as! [String]
             
             print(self.taskArray)
+            print(self.timeArray)
             
             self.mainPriority.string = "\(self.taskArray[0])"
             self.additionalTasks.string = "\(self.taskArray.count) tasks today"
 
             
         }
+        
+        socket.on("up") { data, ack in
+            
+            print("up")
+            // switch modes
+            self.switchModes(self.mainMode)
+            
+        }
+        
+        socket.on("right") { data, ack in
+            
+            
+            print("right")
+            // swipe right boi
+            let a:Int = (self.overviewIndex.string?.integerValue)! - 1
+            
+            print(a)
+            
+            if (a+1 < self.taskArray.count) {
+                self.currentIndex = a+1
+                self.scrollInOverviewMode()
+            }
+            else {
+//                self.currentIndex = 0
+//                self.scrollInOverviewMode()
+            }
+            
+        }
+        
+        socket.on("left") { data, ack in
+            
+            print("left")
+            // swipe right boi
+            let a:Int = (self.overviewIndex.string?.integerValue)! - 1
+            
+            print(a)
+            
+            if (a-1 > -1) {
+                self.currentIndex = a-1
+                self.scrollInOverviewMode()
+            }
+            else {
+//                self.currentIndex = self.taskArray.count - 1
+//                self.scrollInOverviewMode()
+            }
+            
+        }
+        
+        socket.on("leaderboard") { data, ack in
+            
+            print(data[0])
+            print(data[1])
+            
+        }
+        
+        socket.on("ontext") { data, ack in
+            self.taskArray.append(data[0] as! String)
+//            self.append
+            
+        }
+        
         
     }
     
@@ -130,7 +196,7 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
                 // @TODO swipe up with pebble to change views
                 
                 self.mainPriority.fontSize = 20
-                self.mainPriority.frame = CGRectMake(5, 5, 311, 311)
+                self.mainPriority.frame = CGRectMake(5, 100, 311, 311)
                 self.mainPriority.alignmentMode = kCAAlignmentCenter
 //                self.mainPriority.string = "\(self.taskArray[0])"
                 self.mainPriority.foregroundColor = UIColor.whiteColor().CGColor
@@ -141,13 +207,13 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
 //                self.additionalTasks.string = "\(self.taskArray.count) tasks today"
                 
                 self.overviewCenter.fontSize = 20
-                self.overviewCenter.frame = CGRectMake(5, 30, 250, 250)
+                self.overviewCenter.frame = CGRectMake(5, 100, 311, 311)
                 self.overviewCenter.alignmentMode = kCAAlignmentCenter
-                self.overviewCenter.string = "Thorough information"
+//                self.overviewCenter.string = "Thorough information"
                 
                 
                 self.overviewIndex.fontSize = 15
-                self.overviewIndex.frame = CGRectMake(5, 10, 311, 311)
+                self.overviewIndex.frame = CGRectMake(5, 300, 311, 311)
                 self.overviewIndex.alignmentMode = kCAAlignmentCenter
                 self.overviewIndex.string = "1"
                 
@@ -180,6 +246,9 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
             mainPriority.removeFromSuperlayer()
             additionalTasks.removeFromSuperlayer()
         
+            overviewCenter.string = taskArray[0] + "\n" + timeArray[0]
+            overviewIndex.string = "1"
+            
             previewLayer?.addSublayer(overviewCenter)
             previewLayer?.addSublayer(overviewIndex)
         }
@@ -195,10 +264,10 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
             
     }
     
-    func scrollInOverviewMode(index: Int) {
+    func scrollInOverviewMode() {
         
-        overviewCenter.string = taskArray[index]
-        overviewIndex.string = "\(index)"
+        overviewCenter.string = taskArray[currentIndex] + "\n" + timeArray[0]
+        overviewIndex.string = "\(currentIndex + 1)"
         
     }
 

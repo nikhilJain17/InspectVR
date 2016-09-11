@@ -1,8 +1,17 @@
-//code
 var app = require('express')();
 var http = require('http').Server(app);
 var request = require('request');
 var io = require('socket.io')(http);
+var fs = require('fs');
+
+var util = require('util');
+var log_file = fs.createWriteStream(__dirname + '/debug.log', {flags : 'w'});
+var log_stdout = process.stdout;
+
+console.log = function(d) { //
+  log_file.write(util.format(d) + '\n');
+  log_stdout.write(util.format(d) + '\n');
+};
 
 var friends = [{ name: "Rishi", points: 0 }, { name: "Rohan", points: 0 }, { name: "Nikhil", points: 0 }, { name: "Shashank", points: 0 }];
 
@@ -27,6 +36,98 @@ io.on("connection", function(socket){
 
 	});
 
+});
+
+// require('dotenv').config({path: __dirname + '/../.env'});
+
+var app = require('express')();
+var https = require('https');
+
+app.use(require('body-parser').urlencoded({ extended: false }));
+
+app.get('/inbound-sms-webhook', function (req, res) {
+  console.log("get: " + req.query.text);
+  //req.query.text is text message
+
+  var data = JSON.stringify({
+    api_key: 'b1226615',
+    api_secret: 'fc224eb979640d5a',
+    to: 17327427351,
+    // Above number is the user's number
+    from: 12675097488,
+    text: req.query.text
+  })
+
+  var options = {
+    host: 'api.nexmo.com',
+    path: '/tts/json',
+    port: 443,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(data)
+    }
+  };
+
+  var req = https.request(options);
+
+  req.write(data);
+  req.end();
+
+  var responseData = '';
+  req.on('response', function(res){
+    res.on('data', function(chunk){
+      responseData += chunk;
+    });
+
+    res.on('end', function(){
+      console.log(JSON.parse(responseData));
+    });
+  });
+
+  handleWebhook(req.query, res);
+});
+
+app.post('/inbound-sms-webhook', function (req, res) {
+  console.log("post: " + req.body.text);
+  handleWebhook(req.body, res);
+});
+
+function handleWebhook(params, res) {
+  console.log(params);
+
+  var from = params['msisdn']; // the number that send the message
+  var to = params['to']; // the Long Virtual Number the message was sent to
+  var text = params['text'];
+  var timestamp = params['message-timestamp'];
+  var type = params['type']; // text, unicode or binary
+
+
+  res.sendStatus(200);
+}
+
+app.listen(app.get('port'), function() {
+  console.log('Example app listening on port', app.get('port'));
+});
+
+app.get("/up", function(req, resp){
+	io.emit("up");
+	console.log("up")
+});
+
+app.get("/down", function(req, resp){
+	io.emit("down");
+	console.log("down")
+});
+
+app.get("/right", function(req, resp){
+	io.emit("right");
+	console.log("right")
+});
+
+app.get("/left", function(req, resp){
+	io.emit("left");
+	console.log("left")
 });
 
 app.get("/deposit", function(req, resp){

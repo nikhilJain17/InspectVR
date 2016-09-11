@@ -1,0 +1,22 @@
+# Uncomment this line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'InspectAR' do
+  # Comment this line if you're not using Swift and don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for InspectAR
+
+  target 'InspectARTests' do
+    inherit! :search_paths
+    pod 'ImageSlideshow', '~> 0.5'
+
+    # Pods for testing
+  end
+
+  target 'InspectARUITests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+end

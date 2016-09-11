@@ -509,7 +509,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = InspectAR/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.InspectAR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -521,7 +521,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = InspectAR/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.InspectAR;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -593,6 +593,7 @@
 				31EF9E981D83B75F00E6CB3B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		31EF9E991D83B75F00E6CB3B /* Build configuration list for PBXNativeTarget "InspectARTests" */ = {
 			isa = XCConfigurationList;
@@ -601,6 +602,7 @@
 				31EF9E9B1D83B75F00E6CB3B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		31EF9E9C1D83B75F00E6CB3B /* Build configuration list for PBXNativeTarget "InspectARUITests" */ = {
 			isa = XCConfigurationList;
@@ -609,6 +611,7 @@
 				31EF9E9E1D83B75F00E6CB3B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
