@@ -132,13 +132,47 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
             print(data[0])
             print(data[1])
             
-        }
-        
-        socket.on("ontext") { data, ack in
-            self.taskArray.append(data[0] as! String)
-//            self.append
+            
             
         }
+        
+        socket.on("text") { data, ack in
+            
+            print("newbilla alert")
+            print(data)
+            
+            self.taskArray.append(data[0] as! String)
+            self.timeArray.append(data[1] as! String)
+            
+        }
+        
+        // forward slash completed
+        socket.on("completed") { data, ack in
+            
+            print("we are alive and completed")
+            
+            self.timeArray.removeAtIndex(self.currentIndex)
+            self.taskArray.removeAtIndex(self.currentIndex)
+            
+        }
+        
+        
+    }
+    
+    
+    func completedTask(skrskr: String) {
+        
+        print("completed billa")
+        
+        let url = NSURL(string: "http://05751d3d.ngrok.io/completed?task=\(skrskr)" )
+        
+        
+        let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
+            print(NSString(data: data!, encoding: NSUTF8StringEncoding))
+        }
+        
+        task.resume()
+
         
         
     }
@@ -256,6 +290,8 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
             overviewCenter.removeFromSuperlayer()
             overviewIndex.removeFromSuperlayer()
             
+            additionalTasks.string = "\(timeArray.count) tasks today"
+            
             previewLayer?.addSublayer(mainPriority)
             previewLayer?.addSublayer(additionalTasks)
         }
@@ -266,7 +302,7 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
     
     func scrollInOverviewMode() {
         
-        overviewCenter.string = taskArray[currentIndex] + "\n" + timeArray[0]
+        overviewCenter.string = taskArray[currentIndex] + "\n" + timeArray[currentIndex]
         overviewIndex.string = "\(currentIndex + 1)"
         
     }
@@ -276,6 +312,9 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
         if let touch = touches.first {
             print("you touched me")
             switchModes(mainMode);
+            
+            completedTask("penis123")
+            
 //            capturePicture()
         }
         super.touchesBegan(touches, withEvent:event)
