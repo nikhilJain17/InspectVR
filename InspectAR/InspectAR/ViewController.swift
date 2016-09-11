@@ -45,7 +45,7 @@ class ViewController: UIViewController, WCSessionDelegate, UINavigationControlle
     var mainMode: Bool = true;
     
     // soquet
-    let socket = SocketIOClient(socketURL: NSURL(string: "http://eac5581f.ngrok.io")!)
+    let socket = SocketIOClient(socketURL: NSURL(string: "http://05751d3d.ngrok.io")!)
     
     // http://eac5581f.ngrok.io
     // http://05751d3d.ngrok.io
