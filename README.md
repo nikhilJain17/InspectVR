@@ -1,2 +1,3 @@
 # InspectVR
-PennApps XIV - get prices of objects in real time
+
+Look at an object and get its price.
